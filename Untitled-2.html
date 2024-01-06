@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel='stylesheet' type='text/css' href='styles.css'/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building Planner</title>
+</head>
+<body>
+  <div id="app">
+    <div>
+      <canvas id="drawingCanvas" @mousedown="startDrawing" @mousemove="drawShape" @mouseup="endDrawing"></canvas>
+    </div>
+    <div>
+      
+      <button @click="selectDrawTool('line')">Line</button>
+      <button @click="selectDrawTool('rectangle')">Rectangle</button>
+      <button @click="selectDrawTool('circle')">Circle</button>
+
+      <button @click="selectSelectTool">Select</button>
+
+      
+      <button @click="toggleAnnotationVisibility">Toggle Annotations</button>
+
+      <button @click="saveDrawing">Save Drawing</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        drawings: [],
+        selectedDrawing: null,
+        shapes: [],
+        selectedShape: null,
+        drawingTool: null,
+        isDrawing: false,
+        startX: 0,
+        startY: 0,
+        annotationVisible: true
+      },
+      methods: {
+        startDrawing(event) {
+          if (this.drawingTool) {
+            this.isDrawing = true;
+            this.startX = event.clientX;
+            this.startY = event.clientY;
+          }
+        },
+        drawShape(event) {
+          if (this.isDrawing) {
+            
+          }
+        },
+        endDrawing() {
+          if (this.isDrawing) {
+            const newShape = {
+              type: this.drawingTool,
+              x: this.startX,
+              y: this.startY,
+              annotation: this.annotationVisible ? prompt('Enter annotation for the shape:') : '',
+            };
+
+            this.shapes.push(newShape);
+            this.isDrawing = false;
+          }
+        },
+        selectDrawTool(tool) {
+          this.drawingTool = tool;
+        },
+        selectSelectTool() {
+          this.drawingTool = null;
+        },
+        toggleAnnotationVisibility() {
+          this.annotationVisible = !this.annotationVisible;
+        },
+        saveDrawing() {
+          
+          axios.post('/save_shape', this.shapes)
+            .then(response => {
+              console.log(response.data);
+              alert('Drawing saved successfully!');
+            })
+            .catch(error => {
+              console.error('Error saving drawing:', error);
+            });
+        }
+      }
+    });
+  </script>
+</body>
+</html>
